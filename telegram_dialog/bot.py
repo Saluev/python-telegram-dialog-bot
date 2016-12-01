@@ -14,16 +14,14 @@ class DialogBot(object):
 
     def __init__(self, token, dialog):
         self.updater = Updater(token=token)
-        text_handler = MessageHandler(Filters.text, self.handle_command)
-        command_handler = MessageHandler(Filters.command, self.handle_command)
-        self.updater.dispatcher.add_handler(text_handler)
-        self.updater.dispatcher.add_handler(command_handler)
+        handler = MessageHandler(Filters.text | Filters.command, self.handle_message)
+        self.updater.dispatcher.add_handler(handler)
         self.handlers = collections.defaultdict(lambda: dialog())
 
     def start(self):
         self.updater.start_polling()
 
-    def handle_command(self, bot, update):
+    def handle_message(self, bot, update):
         print("Received", update.message)
         chat_id = update.message.chat_id
         if update.message.text == "/start":
@@ -37,7 +35,7 @@ class DialogBot(object):
             print("Answer: %r" % answer)
         except StopIteration:
             del self.handlers[chat_id]
-            return self.handle_command(bot, update)
+            return self.handle_message(bot, update)
         self._send_answer(bot, chat_id, answer)
 
     def _send_answer(self, bot, chat_id, answer):
