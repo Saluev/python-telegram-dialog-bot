@@ -1,0 +1,4 @@
+*.pyc
+build/*
+dist/*
+python_telegram_dialog_bot.egg-info/*
