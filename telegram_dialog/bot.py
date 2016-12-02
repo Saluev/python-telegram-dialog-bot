@@ -16,7 +16,7 @@ class DialogBot(object):
         self.updater = Updater(token=token)
         handler = MessageHandler(Filters.text | Filters.command, self.handle_message)
         self.updater.dispatcher.add_handler(handler)
-        self.handlers = collections.defaultdict(lambda: dialog())
+        self.handlers = collections.defaultdict(dialog)
 
     def start(self):
         self.updater.start_polling()
