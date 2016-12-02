@@ -29,7 +29,7 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
 
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=["telegram_dialog"],
 
     install_requires=['python-telegram-bot'],
 )
