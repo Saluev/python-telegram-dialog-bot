@@ -12,11 +12,11 @@ from .items import *
 
 class DialogBot(object):
 
-    def __init__(self, token, generator):
+    def __init__(self, token, generator, handlers=None):
         self.updater = Updater(token=token)
         handler = MessageHandler(Filters.text | Filters.command, self.handle_message)
         self.updater.dispatcher.add_handler(handler)
-        self.handlers = collections.defaultdict(generator)
+        self.handlers = collections.defaultdict(generator, handlers or {})
 
     def start(self):
         self.updater.start_polling()
