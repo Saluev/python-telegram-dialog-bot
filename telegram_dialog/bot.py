@@ -16,7 +16,8 @@ class DialogBot(object):
         self.updater = Updater(token=token)
         handler = MessageHandler(Filters.text | Filters.command, self.handle_message)
         self.updater.dispatcher.add_handler(handler)
-        self.handlers = collections.defaultdict(generator, handlers or {})
+        self.generator = generator
+        self.handlers = handlers or {}
 
     def start(self):
         self.updater.start_polling()
@@ -27,6 +28,7 @@ class DialogBot(object):
         if update.message.text == "/start":
             self.handlers.pop(chat_id, None)
         if chat_id not in self.handlers:
+            self.handlers[chat_id] = self.generator(**update.to_dict())
             answer = next(self.handlers[chat_id])
         else:
             try:

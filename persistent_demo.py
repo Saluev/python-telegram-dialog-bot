@@ -11,7 +11,7 @@ except ImportError:
 
 from telegram_dialog import *
 
-def dialog():
+def dialog(**kwargs):
     answer = yield "Здравствуйте! Меня забыли наградить именем, а как зовут вас?"
     # убираем ведущие знаки пунктуации, оставляем только
     # первую компоненту имени, пишем её с заглавной буквы
@@ -74,5 +74,5 @@ if __name__ == "__main__":
             time.sleep(1)
         except:
             with open("handlers.pickle", "wb") as f:
-                pickle.dump(dict(dialog_bot.handlers), f)
+                pickle.dump(dialog_bot.handlers, f)
             os._exit(0)
