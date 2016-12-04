@@ -28,7 +28,7 @@ class DialogBot(object):
         if update.message.text == "/start":
             self.handlers.pop(chat_id, None)
         if chat_id not in self.handlers:
-            self.handlers[chat_id] = self.generator(**update.to_dict())
+            self.handlers[chat_id] = self.generator(update.message)
             answer = next(self.handlers[chat_id])
         else:
             try:

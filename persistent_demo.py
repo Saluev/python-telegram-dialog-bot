@@ -11,7 +11,9 @@ except ImportError:
 
 from telegram_dialog import *
 
-def dialog(**kwargs):
+
+@requires_personal_chat("Простите, только в личном чате.")
+def dialog(start_message):
     answer = yield "Здравствуйте! Меня забыли наградить именем, а как зовут вас?"
     # убираем ведущие знаки пунктуации, оставляем только
     # первую компоненту имени, пишем её с заглавной буквы
