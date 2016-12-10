@@ -1,3 +1,7 @@
+from telegram import InlineKeyboardButton
+from telegram import InlineKeyboardMarkup
+
+
 class Message(object):
     def __init__(self, text, **options):
         self.text = text
@@ -24,3 +28,32 @@ class HTML(Message):
         options.pop("parse_mode")
         options = (", " + repr(options)) if options else ""
         return "HTML(%r%s)" % (self.text, options)
+
+
+class EditLast(Message):
+    pass
+
+
+class Button(object):
+    def __init__(self, text, **kwargs):
+        self.text = text
+        self.options = kwargs
+
+    def convert(self):
+        return InlineKeyboardButton(text=self.text, **self.options)
+
+
+class Inline(object):
+    def __init__(self, keyboard):
+        self.keyboard = keyboard
+
+    def convert(self):
+        print(self.keyboard)
+        keyboard = [
+            [
+                (button if isinstance(button, Button) else Button(button)).convert()
+                for button in row
+            ]
+            for row in self.keyboard
+        ]
+        return InlineKeyboardMarkup(keyboard)

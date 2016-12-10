@@ -58,3 +58,41 @@ def requires_personal_chat(error_message):
         return result_func
 
     return decorator
+
+
+def dialog(func):
+    return DialogGenerator(func)
+
+
+class DialogGenerator(object):
+    def __init__(self, dialog_generator):
+        self.dialog_generator = dialog_generator
+        self.inline_generator = None
+
+    def __call__(self, *args, **kwargs):
+        return Dialog(
+            self.dialog_generator(*args, **kwargs),
+            self.inline_generator)
+
+    def inline(self, inline):
+        self.inline_generator = inline
+
+
+class Dialog(object):
+
+    def __init__(self, dialog, inline_generator=None):
+        self.dialog = dialog
+        self.inline_generator = inline_generator
+
+    def __next__(self):
+        return next(self.dialog)
+
+    def send(self, *args, **kwargs):
+        return self.dialog.send(*args, **kwargs)
+
+    def inline_query(self, inline_query):
+        if self.inline_generator is None:
+            return
+        inline = self.inline_generator(inline_query)
+        result = yield from inline
+        return result
