@@ -1,8 +1,9 @@
-import collections.abc
 import functools
 
+from telegram_dialog import Keyboard
 
-def require_choice(caption, table, question=None):
+
+def require_choice(caption, keyboard, question=None):
     """
     Requires user to make a choice of given set of options.
 
@@ -15,21 +16,27 @@ def require_choice(caption, table, question=None):
         Union[Integral, Tuple[Integral, Integral]] - index of chosen option
         String - text of chosen option
     """
-    choices = table
-    if not isinstance(table[0], str):
-        choices = sum(table, [])
+    markup = keyboard
+    if isinstance(keyboard, Keyboard):
+        markup = keyboard.markup
+
+    if not isinstance(markup[0], str):
+        choices = sum(markup, [])
+    else:
+        choices = markup
+
     question = question or caption
-    answer = yield ((caption, table) if caption else table)
+    answer = yield ((caption, keyboard) if caption else keyboard)
     while answer.text not in choices:
-        answer = yield(question)
-    if not isinstance(table[0], str):
+        answer = yield (question)
+    if not isinstance(markup[0], str):
         return next(
             (row_idx, row.index(answer.text))
-            for row_idx, row in enumerate(table)
+            for row_idx, row in enumerate(markup)
             if answer.text in row
         ), answer
     else:
-        return table.index(answer.text), answer
+        return markup.index(answer.text), answer
 
 
 def requires_personal_chat(error_message):
@@ -44,7 +51,6 @@ def requires_personal_chat(error_message):
     """
 
     def decorator(func):
-
         @functools.wraps(func)
         def result_func(message):
             chat_id = message.chat_id
@@ -79,7 +85,6 @@ class DialogGenerator(object):
 
 
 class Dialog(object):
-
     def __init__(self, dialog, inline_generator=None):
         self.dialog = dialog
         self.inline_generator = inline_generator

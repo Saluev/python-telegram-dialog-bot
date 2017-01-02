@@ -53,7 +53,14 @@ class Inline(object):
             [
                 (button if isinstance(button, Button) else Button(button)).convert()
                 for button in row
-            ]
+                ]
             for row in self.keyboard
-        ]
+            ]
         return InlineKeyboardMarkup(keyboard)
+
+
+class Keyboard(object):
+    def __init__(self, markup, one_time_keyboard=True, resize_keyboard=False):
+        self.markup = markup
+        self.one_time_keyboard = one_time_keyboard
+        self.resize_keyboard = resize_keyboard
