@@ -53,9 +53,9 @@ class Inline(object):
             [
                 (button if isinstance(button, Button) else Button(button)).convert()
                 for button in row
-                ]
-            for row in self.keyboard
             ]
+            for row in self.keyboard
+        ]
         return InlineKeyboardMarkup(keyboard)
 
 
