@@ -2,20 +2,17 @@ import collections
 import collections.abc
 import copy
 
-from telegram.ext import Filters
-from telegram import InlineKeyboardButton
-from telegram import InlineKeyboardMarkup
-from telegram.ext import InlineQueryHandler
-from telegram.ext import MessageHandler
 from telegram import ReplyKeyboardMarkup
 from telegram import ReplyMarkup
+from telegram.ext import Filters
+from telegram.ext import InlineQueryHandler
+from telegram.ext import MessageHandler
 from telegram.ext import Updater
 
 from .items import *
 
 
 class DialogBot(object):
-
     def __init__(self, token, generator, handlers=None):
         self.updater = Updater(token=token)
         message_handler = MessageHandler(Filters.text | Filters.command, self.handle_message)
@@ -98,7 +95,8 @@ class DialogBot(object):
 
     def _send_or_edit(self, bot, chat_id, message):
         if isinstance(message, EditLast):
-            bot.editMessageText(text=message.text, chat_id=chat_id, message_id=self.last_message_ids[chat_id], **message.options)
+            bot.editMessageText(text=message.text, chat_id=chat_id, message_id=self.last_message_ids[chat_id],
+                                **message.options)
         else:
             print("Sending message: %r" % message.text)
             self.last_message_ids[chat_id] = bot.sendMessage(chat_id=chat_id, text=message.text, **message.options)
@@ -106,19 +104,30 @@ class DialogBot(object):
     def _convert_answer_part(self, answer_part):
         if isinstance(answer_part, str):
             return Message(answer_part)
-        if isinstance(answer_part, collections.abc.Iterable):
+        if isinstance(answer_part, (collections.abc.Iterable, Keyboard)):
             # клавиатура?
-            answer_part = list(answer_part)
+            resize_keyboard = False
+            one_time_keyboard = True
+
+            if isinstance(answer_part, collections.abc.Iterable):
+                answer_part = list(answer_part)
+            else:
+                one_time_keyboard = answer_part.one_time_keyboard
+                resize_keyboard = answer_part.resize_keyboard
+                answer_part = answer_part.markup
+
             if isinstance(answer_part[0], str):
                 # она! оформляем как горизонтальный ряд кнопок.
                 # кстати, все наши клавиатуры одноразовые -- нам пока хватит.
-                return ReplyKeyboardMarkup([answer_part], one_time_keyboard=True)
+                return ReplyKeyboardMarkup([answer_part], one_time_keyboard=one_time_keyboard,
+                                           resize_keyboard=resize_keyboard)
             elif isinstance(answer_part[0], collections.abc.Iterable):
                 # двумерная клавиатура?
                 answer_part = list(map(list, answer_part))
                 if isinstance(answer_part[0][0], str):
                     # она!
-                    return ReplyKeyboardMarkup(answer_part, one_time_keyboard=True)
+                    return ReplyKeyboardMarkup(answer_part, one_time_keyboard=one_time_keyboard,
+                                               resize_keyboard=resize_keyboard)
         if isinstance(answer_part, Inline):
             return answer_part.convert()
         return answer_part
