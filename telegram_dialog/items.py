@@ -10,7 +10,7 @@ class Message(object):
 
 class Markdown(Message):
     def __init__(self, text, **options):
-        super(Markup, self).__init__(text, parse_mode="Markdown", **options)
+        super(Markdown, self).__init__(text, parse_mode="Markdown", **options)
 
     def __repr__(self):
         options = dict(self.options)
